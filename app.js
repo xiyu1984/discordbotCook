@@ -1,6 +1,7 @@
 const fs = require('node:fs');
 const { Client, Collection, Intents } = require('discord.js');
 const denv = require ('dotenv/config');
+const { ClientRequest } = require('node:http');
 
 // Create a new client instance
 const client = new Client({
@@ -21,22 +22,43 @@ for (const file of commandFiles) {
 	client.commands.set(command.data.name, command);
 }
 
+client.selectMenu = new Collection();
+const selectFiles = fs.readdirSync('./select').filter(file => file.endsWith('.js'));
+
+for (const sfile of selectFiles) {
+	const selectExe = require(`./select/${sfile}`);
+	client.selectMenu.set(selectExe.data.name, selectExe);
+}
+
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
 	console.log('Ready!');
 });
 
 client.on('interactionCreate', async interaction => {
-  
-    const command = client.commands.get(interaction.commandName);
 
-	if (!command) return;
+	if (interaction.isCommand()){
+		const command = client.commands.get(interaction.commandName);
 
-	try {
-		await command.execute(interaction);
-	} catch (error) {
-		console.error(error);
-		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+		if (!command) return;
+
+		try {
+			await command.execute(interaction);
+		} catch (error) {
+			console.error(error);
+			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+		}
+	} else if(interaction.isSelectMenu()){
+		const mySelect = client.selectMenu.get(interaction.customId);
+
+		if (!mySelect) return;
+
+		try {
+			await mySelect.execute(interaction);
+		} catch (error) {
+			console.error(error);
+			await interaction.reply({ content: 'There was an error while executing this selectMenu!', ephemeral: true });
+		}
 	}
 });
 
