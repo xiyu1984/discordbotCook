@@ -5,6 +5,6 @@ module.exports = {
         name: 'oneselect',
     },
 	async execute(interaction) {
-		await interaction.reply(await interaction.update({ content: 'Something was selected!'+ interaction.values, components: []}));
+		await interaction.update({ content: 'Something was selected!'+ interaction.values, components: []});
 	},
 };
