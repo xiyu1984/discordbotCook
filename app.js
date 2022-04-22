@@ -30,6 +30,16 @@ for (const sfile of selectFiles) {
 	client.selectMenu.set(selectExe.data.name, selectExe);
 }
 
+client.buttons = new Collection();
+const buttonFiles = fs.readdirSync('./button').filter(file => file.endsWith('.js'));
+
+for (const bfile of buttonFiles) {
+	const buttonExe = require(`./button/${bfile}`);
+  for (const buttonItem of buttonExe){
+    client.buttons.set(buttonItem.data.name, buttonItem);
+  }
+}
+
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
 	console.log('Ready!');
@@ -55,6 +65,17 @@ client.on('interactionCreate', async interaction => {
 
 		try {
 			await mySelect.execute(interaction);
+		} catch (error) {
+			console.error(error);
+			await interaction.reply({ content: 'There was an error while executing this selectMenu!', ephemeral: true });
+		}
+	} else if (interaction.isButton()){
+		const myButton = client.buttons.get(interaction.customId);
+
+		if (!myButton) return;
+
+		try {
+			await myButton.execute(interaction);
 		} catch (error) {
 			console.error(error);
 			await interaction.reply({ content: 'There was an error while executing this selectMenu!', ephemeral: true });
