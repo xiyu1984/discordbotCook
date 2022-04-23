@@ -19,4 +19,11 @@
     "node-fetch": "^3.2.3",
     "web3": "^1.7.3"
   }
+  /***** Delete this when executing *****/
+  // It's necessary below for glitcj
+  // "engines": {
+  //   "node": "16.x",
+  //   "npm": "7.x"
+  // }
+  /***** Delete this when executing *****/
 }
