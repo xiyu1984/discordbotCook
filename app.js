@@ -1,5 +1,5 @@
 const fs = require('node:fs');
-const { Client, Collection, Intents } = require('discord.js');
+const { Client, Collection, Intents, MessageEmbed, WebhookClient } = require('discord.js');
 const denv = require ('dotenv/config');
 const { ClientRequest } = require('node:http');
 
@@ -81,6 +81,34 @@ client.on('interactionCreate', async interaction => {
 			await interaction.reply({ content: 'There was an error while executing this selectMenu!', ephemeral: true });
 		}
 	}
+});
+
+// example for arbitrary message response in guild
+client.on('messageCreate', message => {
+	// send `response information` to the message sender and the related channel
+	if (message.author.id != process.env.APP_ID) {
+	  const channel = client.channels.cache.get(message.channelId);
+	  // The `response information` below will be shown in the channel get a message
+	  channel.send({content: `Hello, ${message.author.id}. Received message is: ${message.content}`});
+	  // DM to the message sender
+	  client.users.fetch(message.author.id).then(user => {
+		user.send({content: `Hello, ${message.author.id}. Received message is: ${message.content}`});
+	  });
+	}
+});
+  
+// example for `webhook`, which is bound to a concrete channel.
+const webhookClient = new WebhookClient({ url: "https://discord.com/api/webhooks/970603264900993085/m2kmPNd5BgpO_K0w2EaMVcCfy5MfRjKkTR5uSnC9taqI_tatuUL1DKKNVUr2Y9_yAI_B" });
+
+const embed = new MessageEmbed()
+	.setTitle('Hello hook!')
+	.setColor('#0099ff');
+
+webhookClient.send({
+	content: 'Webhook test',
+	username: 'some-username',
+	avatarURL: 'https://i.imgur.com/AfFp7pu.png',
+	embeds: [embed],
 });
 
 // Login to Discord with your client's token
