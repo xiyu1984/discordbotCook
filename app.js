@@ -90,19 +90,19 @@ const modalFiles = fs.readdirSync('./modal').filter(file => file.endsWith('.js')
 
 for (const modalfile of modalFiles) {
 	const modalItem = require(`./modal/${modalfile}`);
-  client.modals.set(modalItem.data.name, modalItem);
+  	client.modals.set(modalItem.data.name, modalItem);
 }
 
 client.on('modalSubmit', async (modal) => {
-  const modalExe = client.modals.get(modal.customId );
-  
-  if (!modalExe) return;
-  
-  try {
-    await modalExe.execute(modal);
-  } catch (error) {
-    console.error(error);
-  }
+	const modalExe = client.modals.get(modal.customId );
+	
+	if (!modalExe) return;
+	
+	try {
+		await modalExe.execute(modal);
+	} catch (error) {
+		console.error(error);
+	}
 });
 
 // client.on('guildMemberAdd', member => {
@@ -126,18 +126,18 @@ client.on('messageCreate', async message => {
 		const messageExe = client.recvMessages.get(message.content);
 
     // messages that do not reqiere special handling
-		if (!messageExe) {
-			// const channel = client.channels.cache.get(message.channelId);
-      		// channel.send({content: `Hello, ${message.author.id}. Received message is: ${message.content}. I don't know what's its meaning.`});
-			console.log(`Hello, ${message.author.id}. Received message is: ${message.content}. I don't know what's its meaning.`);
-      		return;
-		}
+	if (!messageExe) {
+		// const channel = client.channels.cache.get(message.channelId);
+		// channel.send({content: `Hello, ${message.author.id}. Received message is: ${message.content}. I don't know what's its meaning.`});
+		console.log(`Hello, ${message.author.id}. Received message is: ${message.content}. I don't know what's its meaning.`);
+		return;
+	}
 
-		try {
-			await messageExe.execute(message);
-		} catch (error) {
-			console.error(error);
-		}
+	try {
+		await messageExe.execute(message);
+	} catch (error) {
+		console.error(error);
+	}
 	}
 });
 
