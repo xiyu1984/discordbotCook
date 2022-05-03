@@ -1,6 +1,6 @@
 # Discord bot cooking
 
-Currently, this templete just provide the slash command framework. Other functions will be added soon.
+Currently, this templete just provide the slash command, components(button, select manue, text input), and message framework. Other functions will be added soon.
 
 ## Framework
 
