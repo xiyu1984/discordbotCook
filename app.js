@@ -142,7 +142,7 @@ client.on('messageCreate', async message => {
 });
 
 // example for `webhook`, which is bound to a concrete channel.
-const webhookClient = new WebhookClient({ url: "https://discord.com/api/webhooks/970603264900993085/m2kmPNd5BgpO_K0w2EaMVcCfy5MfRjKkTR5uSnC9taqI_tatuUL1DKKNVUr2Y9_yAI_B" });
+const webhookClient = new WebhookClient({ url: process.env.GENERAL_HOOK });
 
 const embed = new MessageEmbed()
 	.setTitle('Hello hook!')
