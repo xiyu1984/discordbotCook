@@ -2,6 +2,7 @@ const fs = require('node:fs');
 const { Client, Collection, Intents, MessageEmbed, WebhookClient } = require('discord.js');
 const denv = require ('dotenv/config');
 const { ClientRequest } = require('node:http');
+const discordModals = require('discord-modals') // Define the discord-modals package!
 
 // Create a new client instance
 const client = new Client({
@@ -83,20 +84,63 @@ client.on('interactionCreate', async interaction => {
 	}
 });
 
+// example for input text
+client.modals = new Collection();
+const modalFiles = fs.readdirSync('./modal').filter(file => file.endsWith('.js'));
+
+for (const modalfile of modalFiles) {
+	const modalItem = require(`./modal/${modalfile}`);
+  client.modals.set(modalItem.data.name, modalItem);
+}
+
+client.on('modalSubmit', async (modal) => {
+  const modalExe = client.modals.get(modal.customId );
+  
+  if (!modalExe) return;
+  
+  try {
+    await modalExe.execute(modal);
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+// client.on('guildMemberAdd', member => {
+  
+// });
+
 // example for arbitrary message response in guild
-client.on('messageCreate', message => {
+client.recvMessages = new Collection();
+const msgFiles = fs.readdirSync('./message').filter(file => file.endsWith('.js'));
+
+for (const mfile of msgFiles) {
+	const msgExe = require(`./message/${mfile}`);
+	for (const msgItem of msgExe){
+		client.recvMessages.set(msgItem.data.name, msgItem);
+	}
+}
+
+client.on('messageCreate', async message => {
 	// send `response information` to the message sender and the related channel
 	if (message.author.id != process.env.APP_ID) {
-	  const channel = client.channels.cache.get(message.channelId);
-	  // The `response information` below will be shown in the channel get a message
-	  channel.send({content: `Hello, ${message.author.id}. Received message is: ${message.content}`});
-	  // DM to the message sender
-	  client.users.fetch(message.author.id).then(user => {
-		user.send({content: `Hello, ${message.author.id}. Received message is: ${message.content}`});
-	  });
+		const messageExe = client.recvMessages.get(message.content);
+
+    // messages that do not reqiere special handling
+		if (!messageExe) {
+			// const channel = client.channels.cache.get(message.channelId);
+      		// channel.send({content: `Hello, ${message.author.id}. Received message is: ${message.content}. I don't know what's its meaning.`});
+			console.log(`Hello, ${message.author.id}. Received message is: ${message.content}. I don't know what's its meaning.`);
+      		return;
+		}
+
+		try {
+			await messageExe.execute(message);
+		} catch (error) {
+			console.error(error);
+		}
 	}
 });
-  
+
 // example for `webhook`, which is bound to a concrete channel.
 const webhookClient = new WebhookClient({ url: "https://discord.com/api/webhooks/970603264900993085/m2kmPNd5BgpO_K0w2EaMVcCfy5MfRjKkTR5uSnC9taqI_tatuUL1DKKNVUr2Y9_yAI_B" });
 
@@ -110,6 +154,9 @@ webhookClient.send({
 	avatarURL: 'https://i.imgur.com/AfFp7pu.png',
 	embeds: [embed],
 });
+
+// without the below line, `client.on('modalSubmit'...` will not work
+discordModals(client); 
 
 // Login to Discord with your client's token
 client.login(process.env.DISCORD_TOKEN);
