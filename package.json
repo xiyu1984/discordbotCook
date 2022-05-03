@@ -21,7 +21,7 @@
     "web3": "^1.7.3"
   }
 /***** Delete this when executing *****/
-// It's necessary below for glitcj
+// It's necessary below for glitch
 // "engines": {
 //   "node": "16.x",
 //   "npm": "7.x"
